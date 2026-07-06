@@ -94,6 +94,64 @@ Disadvantages of **BGP Top Of Rack Networking** solution:
 
 But the problem is, ECMP only works if BGP Agent is install on VMs, and only when Leaf Switches is configued to allow BGP Peering from VM. This approach create security risk, so think carefully before using it.
 
+Update: On some big internet providers, they use ECMP+ BGP approach like that:
+
+- https://blog.cloudflare.com/high-availability-load-balancers-with-maglev/
+- https://github.com/Exa-Networks/exabgp
+- https://techdocs.f5.com/kb/en-us/products/big-ip_ltm/manuals/product/bigip-system-ecmp-mirrored-clustering-12-1-0/1.html
+- https://www.haproxy.com/documentation/haproxy-enterprise/enterprise-modules/active-active/route-health-injection/
+- https://docs.fortinet.com/document/fortiadc/8.0.3/administration-guide/984372/deploying-an-active-active-cluster
+- 
+Steps:
+
+- Power-On two VMs or two hardware load balancer device on network like ExaBGP or HAProxy Enterprise or FortiADC 420F
+- configure Routers/Switches that connect directly to two VMs/Hardware LB to accept BGP message sent from VM/Hardware LB
+- Configure VIPs to all LB VMs/devices to start annouce /32 route to directly connected Routers/Switches
+
+
+For example:
+
+```conf
+rhi-bgp dc1
+  hold-time 30
+  timeout connect 1s
+  timeout open 5s
+  timeout reconnect 1s
+  timeout keepalive 10s
+  timeout min-update-interval 3s
+  timeout graceful-restart 5s
+  log global
+
+  local-id 0.0.0.1
+  local-as 65001
+  neighbor myrouter 192.168.0.1:179 as 65001
+  next-hop-ipv4 192.168.0.101
+
+  acl backend_is_up nbsrv(webservers) gt 0
+  rhi-announce addrs 192.168.1.10/32 if backend_is_up
+```
+
+
+```conf
+rhi-bgp dc1
+  hold-time 30
+  timeout connect 1s
+  timeout open 5s
+  timeout reconnect 1s
+  timeout keepalive 10s
+  timeout min-update-interval 3s
+  timeout graceful-restart 5s
+  log global
+
+  local-id 0.0.0.2
+  local-as 65001
+  neighbor myrouter 192.168.0.1:179 as 65001
+  next-hop-ipv4 192.168.0.102
+
+  acl backend_is_up nbsrv(webservers) gt 0
+  rhi-announce addrs 192.168.1.10/32 if backend_is_up
+```
+
 ### Referrences 
 
 - https://www.youtube.com/watch?v=GjtIf40_e6k&t=805s
