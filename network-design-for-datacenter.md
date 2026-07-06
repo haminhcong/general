@@ -94,7 +94,7 @@ Disadvantages of **BGP Top Of Rack Networking** solution:
 
 But the problem is, ECMP only works if BGP Agent is install on VMs, and only when Leaf Switches is configued to allow BGP Peering from VM. This approach create security risk, so think carefully before using it.
 
-Update: On some big internet providers, they use ECMP+ BGP approach like that:
+**Update**: On some big internet providers, they use ECMP+ BGP approach like that:
 
 - https://blog.cloudflare.com/high-availability-load-balancers-with-maglev/
 - https://github.com/Exa-Networks/exabgp
