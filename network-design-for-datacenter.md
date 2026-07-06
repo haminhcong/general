@@ -94,7 +94,11 @@ Disadvantages of **BGP Top Of Rack Networking** solution:
 
 But the problem is, ECMP only works if BGP Agent is install on VMs, and only when Leaf Switches is configued to allow BGP Peering from VM. This approach create security risk, so think carefully before using it.
 
-**Update**: On some big internet providers, they use ECMP+ BGP approach like that:
+**Update**: 
+
+**1 - How to create VIP Endpoint in Provider Networks**
+
+On some big internet providers, they use ECMP+ BGP approach like that:
 
 - https://blog.cloudflare.com/high-availability-load-balancers-with-maglev/
 - https://github.com/Exa-Networks/exabgp
@@ -151,6 +155,15 @@ rhi-bgp dc1
   acl backend_is_up nbsrv(webservers) gt 0
   rhi-announce addrs 192.168.1.10/32 if backend_is_up
 ```
+
+**2 - How about Tenant Networks for VMS in each Compute Nodes**
+
+In BGP Top Of Rack Network, because we still have L3 connection between Compute Node IP,
+then usually we still use `Geneve Overay Network` for building tenant networks, as the same
+as other network solutions.
+
+BGP ToR networking does not mean every OpenStack tenant network must become a physical/provider network. 
+It mainly affects the underlay and north-south routing.
 
 ### Referrences 
 
